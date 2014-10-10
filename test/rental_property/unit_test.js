@@ -1,4 +1,4 @@
-var expect = require("chai").expect,
+  var expect = require("chai").expect,
   app = require("../../src/app"),
   Building = app.Building,
   Unit = app.Unit,

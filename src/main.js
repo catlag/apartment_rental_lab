@@ -5,6 +5,24 @@ var app = require('./app.js');
 var building = new app.Building("Waterfront Tower");
 var people = [];
 
+people.push(new app.Person("Anna", "765-4321"));
+people.push(new app.Person("Karl", "754-4234"));
+people.push(new app.Person("Joe", "831-5595"));
+var john = new app.Manager("John", "700-4321");
+building.setManager(john);
+people.push(john);
+var devin = new app.Tenant("Devin", "765-1234");
+devin.addReference(new app.Person("Carl", "415 3536 222"));
+devin.addReference(new app.Person("Steve", "415 1111 222"));
+people.push(devin);
+ var bob = new app.Tenant("Bob", "744-1234");
+bob.addReference(new app.Person("Jimmy","353 4354 3452"));
+people.push(bob);
+
+building.units.push(new app.Unit("12", building, 400, 2000));
+building.units.push(new app.Unit("13", building, 800, 3000));
+building.units.push(new app.Unit("14", building, 1800, 4500));
+
 // --------------------------------
 menu.addDelimiter('-', 40, building.address + " rental app");
 
@@ -56,26 +74,47 @@ menu.addItem('Add unit',
 menu.addItem('Show all units', 
   function() {
     for(var i = building.units.length - 1; i >= 0; i--) {
-      console.log(" tenant: " + building.units[i].tenant +
+      if (building.units[i].tenant === null){
+        console.log(" tenant: " +
+              " num: " + building.units[i].number + 
+                  " sqft: " + building.units[i].sqft +
+                  " rent: $" + building.units[i].rent);
+      } else {
+      console.log(" tenant: " + building.units[i].tenant.name +
       			  " num: " + building.units[i].number + 
                   " sqft: " + building.units[i].sqft +
                   " rent: $" + building.units[i].rent);
+        }
     }
   }  
 );
 
-menu.addItem('(implement me) Show available units', 
+menu.addItem('Show available units', 
   function() {
-      console.log("Implement me");
+    for(var i = building.units.length -1; i >= 0; i--){
+      if ( building.units[i].tenant === null){
+      console.log(" num: " + building.units[i].number + 
+                  " sqft: " + building.units[i].sqft +
+                  " rent: $" + building.units[i].rent);
+    }
+    }
     } 
 );
 
-menu.addItem('(implement me) Add tenant reference', 
+// create people check if ref is instanceof people and not a tennatn
+menu.addItem('Add tenant reference', 
   function(tenant_name, ref_name, ref_contact) {
-     // Note: Don't create a new Tenant. Pick a name of exiting tenant.
-      // Find the corresponding tenant object and add reference. Reference
-      // is a new Person object.
-      console.log("Implement me. Show error if tenant is unknown. Note: a reference is a person");
+    people.forEach(function(person) {
+      if (person.name instanceof app.Tenant) {
+        return;
+      } 
+    });
+    // var reference = new app.Person(ref_name, ref_contact);
+    people.forEach(function (person) {
+      if (person.name === tenant_name && person instanceof app.Tenant){
+        person.addReference(reference);
+      }
+     }); 
     },
     null, 
     [{'name': 'tenant_name', 'type': 'string'},
@@ -83,36 +122,90 @@ menu.addItem('(implement me) Add tenant reference',
     {'name': 'ref_contact', 'type': 'string'}] 
 );
 
-menu.addItem('(implement me) Move tenant in unit', 
+
+menu.addItem('Move tenant in unit', 
   function(unit_number, tenant_name) {
-      // find tenant and unit objects, use building's addTenant() function.
-      console.log("Implement me.");
-    },
-    null, 
-    [{'name': 'unit_number', 'type': 'string'},
-    {'name': 'tenant_name', 'type': 'string'}] 
+    // building.addTenant(unit_number, tenant_name);
+    //   // find tenant and unit objects, use building's addTenant() function.
+    var targetUnit;
+
+    building.units.forEach(function(unit) {
+      if (unit_number == unit.number) {
+        targetUnit = unit;
+      }
+    });
+
+    people.forEach(function(tenant) {
+      if(tenant_name === tenant.name) {
+        building.addTenant(targetUnit, tenant);
+      }
+    });
+  },
+  null, 
+  [{'name': 'unit_number', 'type': 'string'},
+  {'name': 'tenant_name', 'type': 'string'}] 
 );
+
 
 menu.addItem('(implement me) Evict tenant', 
   function(tenant_name) {
-      // Similar to above, use building's removeTenant() function.
-      console.log("Implement me");
+
+// find  tenant in people array and if they exist 
+// remove teneant object not name. 
+
+      // Similar to above, use whatever you want.
+   //    var targetUnit;
+
+   //  building.units.forEach(function(unit) {
+   //    if(unit.tenant !== null && tenant_name == unit.tenant.name){
+   //      targetUnit = unit.number;
+        
+   //      }
+
+   //    });
+
+   // building.removeTenant(targetUnit, tenant);
+   
+   building.units.forEach(function (unit) {
+    if(unit.tenant && unit.tenant.name === tenant_name){
+      unit.tenant = null;
+    }
+   });
     },
     null, 
     [{'name': 'tenant_name', 'type': 'string'}] 
 );
 
 menu.addItem('(implement me) Show total sqft rented', 
-  function() {
-      console.log("Implement me");
+function() {
+    var total = 0;
+
+    building.units.forEach(function(unit){
+      if (unit.tenant !== null){
+        
+        total += unit.sqft;
+       
+        }
+    });
+
+      console.log(total);
     } 
 );
 
 menu.addItem('(implement me) Show total yearly income', 
   function() {
-      // Note: only rented units produce income
-      console.log("Implement me.");
+    var total = 0;
+   
+    building.units.forEach(function(unit){
+      if (unit.tenant !== null){
+        // total.push(unit.rent);
+        total += unit.rent;
+        }
+    });
+
+      console.log(total);
     } 
+
 );
 
 menu.addItem('(Add your own feature ...)', 

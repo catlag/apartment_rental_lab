@@ -46,9 +46,13 @@ Building.prototype.removeTenant = function(unit, tenant) {
   if(this.units.indexOf(unit) === -1){
     return;
   }
-  if (unit.tenant === tenant){
-    unit.tenant = null;
+  if (unit.tenant !== tenant){
+    return;
   }
+  if (unit.tenant !== null){
+   unit.tenant = null;
+  }
+
  
 };
 

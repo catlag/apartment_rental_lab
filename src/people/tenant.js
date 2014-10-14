@@ -16,7 +16,7 @@ Tenant.prototype.addReference = function(reference){
 
 Tenant.prototype.removeReference = function(reference) {
    if (this.references.indexOf(reference) !== -1) {
-  		this.references.splice(this.references.indexOf(reference),1)
+  		this.references.splice(this.references.indexOf(reference),1);
   	}
   return this;
 };
